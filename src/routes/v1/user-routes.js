@@ -5,6 +5,9 @@ const { UserController } = require('../../controllers');
 const { UserMiddlewares } = require('../../middlewares');
 
 router
-    .post('/', UserMiddlewares ,UserController.signup);
+    .post('/signup', UserMiddlewares ,UserController.signup);
+
+    router
+    .post('/signin' ,UserController.signin);
 
 module.exports = router;
