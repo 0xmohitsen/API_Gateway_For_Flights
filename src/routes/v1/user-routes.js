@@ -5,9 +5,9 @@ const { UserController } = require('../../controllers');
 const { UserMiddlewares } = require('../../middlewares');
 
 router
-    .post('/signup', UserMiddlewares ,UserController.signup);
+    .post('/signup', UserMiddlewares.validateUserRequest ,UserController.signup);
 
     router
-    .post('/signin' ,UserController.signin);
+    .post('/signin',UserMiddlewares.validateUserRequest ,UserController.signin);
 
 module.exports = router;
