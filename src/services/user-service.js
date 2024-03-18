@@ -111,10 +111,28 @@ async function isAdmin(id){
     }
 }
 
+async function isNotCustomer(id){
+    try {
+        const user = await userRepo.get(id);
+        if(!user){
+            throw new AppError('No user found', StatusCodes.NOT_FOUND);
+        }
+
+        const flight_companyrole = await roleRepo.getRoleByName(Enums.ROLE_TYPES.FLIGHT_COMPANY);
+
+        return user.hasRole(flight_companyrole);
+        
+    } catch (error) {
+        if(error instanceof AppError) throw error;
+        throw new AppError('Something went wrong while checking the admin or flight_company', StatusCodes.INTERNAL_SERVER_ERROR);
+    }
+}
+
 module.exports = {
     signup,
     signin,
     isAuthenticated,
     addRoleToUser,
-    isAdmin
+    isAdmin,
+    isNotCustomer
 }

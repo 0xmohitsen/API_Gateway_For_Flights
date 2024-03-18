@@ -3,8 +3,12 @@ const { ServerConfig } = require('./config');
 const apiRoutes = require('./routes');
 const { rateLimit } = require('express-rate-limit');
 const { createProxyMiddleware } = require('http-proxy-middleware');
+const { UserService } = require('./services');
+const { UserMiddlewares } = require('./middlewares');
 
 const app = express();
+
+const authenticationAndAuthorization = [UserMiddlewares.checkAuth ,isAdminOrFlightCompany];
 
 const limiter = rateLimit({
 	windowMs: 2 * 60 * 1000, // 2 minutes
@@ -14,15 +18,31 @@ app.use(limiter);
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
 
-app.use('/flightsService', createProxyMiddleware({ target: ServerConfig.FLIGHT_SERVER , 
+app.use('/flightsService', authenticationAndAuthorization, createProxyMiddleware({ target: ServerConfig.FLIGHT_SERVER , 
     changeOrigin: true, 
-    pathRewrite: {'^/flightsService': '/'} 
+    pathRewrite: {'^/flightsService': '/'}
 }));
-app.use('/bookingService', createProxyMiddleware({ target: ServerConfig.BOOKING_SERVER , 
+
+// app.post('/flightsService', [UserMiddlewares.checkAuth ,isAdminOrFlightCompany],createProxyMiddleware({ target: ServerConfig.FLIGHT_SERVER , 
+//     changeOrigin: true, 
+//     pathRewrite: {'^/flightsService': '/'}
+// }));
+
+
+app.use('/bookingService',authenticationAndAuthorization, createProxyMiddleware({ target: ServerConfig.BOOKING_SERVER , 
     changeOrigin: true , 
     pathRewrite: {
         '^/bookingService': '/'}
 }));
+
+async function isAdminOrFlightCompany(req, res, next){
+    const response = await UserService.isAdmin(req.user);
+    if(!response){
+        UserMiddlewares.isFlightCompany(req, res, next);
+    }
+
+    next();
+}
 
 app.use('/api', apiRoutes);
 

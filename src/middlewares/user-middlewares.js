@@ -42,6 +42,17 @@ async function checkAuth(req, res, next){
 
 async function isAdmin(req, res, next){
     const response = await UserService.isAdmin(req.user);
+    console.log(response);
+    if(!response){
+        return res
+                .status(StatusCodes.UNAUTHORIZED)
+                .json({message: 'Not authorized to perform this action'});
+    }
+    next();
+}
+
+async function isFlightCompany(req, res, next){
+    const response = await UserService.isNotCustomer(req.user);
     if(!response){
         return res
                 .status(StatusCodes.UNAUTHORIZED)
@@ -53,5 +64,6 @@ async function isAdmin(req, res, next){
 module.exports = {
     validateUserRequest,
     checkAuth,
-    isAdmin
+    isAdmin,
+    isFlightCompany
 }
