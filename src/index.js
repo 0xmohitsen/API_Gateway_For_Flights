@@ -12,7 +12,7 @@ const authenticationAndAuthorization = [UserMiddlewares.checkAuth];
 
 const limiter = rateLimit({
 	windowMs: 2 * 60 * 1000, // 2 minutes
-	limit: 10, // Limit each IP to 2 requests per `window` (here, per 2 minutes).
+	limit: 30, // Limit each IP to 2 requests per `window` (here, per 2 minutes).
 })
 app.use(limiter);
 app.use(express.json());
@@ -36,6 +36,11 @@ async function isAdminOrFlightCompany(req, res, next){
     }
     next();
 }
+
+app.get('/home', (req, res) => {
+
+    return res.json({message: 'Welcome to the Homepage'});
+});
 
 app.use('/api', apiRoutes);
 
