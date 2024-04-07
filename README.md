@@ -11,7 +11,7 @@ Airline (getSetFly) is a backend project developed for managing flight bookings 
 - Uses Proxy for redirecting requests/API calls to the appropriate service
 - Implements rate-limiting to prevent server overload
 
-### 2. Flight Service
+### 2. [Flight Service](https://github.com/Mohitsen11/Flights_Project)
 
 [Link](https://github.com/Mohitsen11/Flights_Project)
 
