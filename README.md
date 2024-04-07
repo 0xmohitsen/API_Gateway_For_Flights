@@ -1,4 +1,4 @@
-# Airline (getSetFly) - Microservices-based Flight Booking System
+# GetSetFly - Microservices-based Flight Booking System
 
 Airline (getSetFly) is a backend project developed for managing flight bookings and notifications using a microservices architecture. It consists of several services built with Node.js, Express.js, and MySQL's Sequelize ORM. The project follows best practices for backend development, including role-based authorization, rate-limiting, and message queuing for efficient communication between services.
 
