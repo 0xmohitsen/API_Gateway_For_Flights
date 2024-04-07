@@ -41,7 +41,7 @@ Airline (getSetFly) is a backend project developed for managing flight bookings 
 
 To run the project locally, follow these steps:
 
-1. Clone the repository: `git clone <repository_url>`
+1. Clone the repository: `git clone https://github.com/Mohitsen11/API_Gateway_For_Flights.git`
 2. Install dependencies: `npm install`
 3. Configure environment variables
 4. Start each service: `npm start`
@@ -49,7 +49,3 @@ To run the project locally, follow these steps:
 ## Contributing
 
 Contributions are welcome! If you find any issues or have suggestions for improvements, please feel free to open an issue or submit a pull request.
-
-## License
-
-This project is licensed under the [MIT License](LICENSE).
