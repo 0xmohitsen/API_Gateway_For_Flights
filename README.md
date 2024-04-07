@@ -13,8 +13,6 @@ Airline (getSetFly) is a backend project developed for managing flight bookings 
 
 ### 2. [Flight Service](https://github.com/Mohitsen11/Flights_Project)
 
-[Link](https://github.com/Mohitsen11/Flights_Project)
-
 - Provides information about flights, airplanes, cities, and airports
 - Supports CRUD operations for flights
 - Implements associations for tables related to flights, airplanes, cities, and airports
@@ -22,17 +20,13 @@ Airline (getSetFly) is a backend project developed for managing flight bookings 
 - Leverages the power of SQL queries to efficiently filter flight data based on the provided criteria. It utilizes Sequelize ORM's query-building capabilities to construct dynamic queries and retrieve relevant 
   flight information from the database. 
 
-### 3. Flight Booking Service
-
-[Link](https://github.com/Mohitsen11/Flights_Booking_Service)
+### 3. [Flight Booking Service](https://github.com/Mohitsen11/Flights_Booking_Service)
 
 - Allows authenticated users, admins, and flight companies to book tickets
 - Publishes events to the Message Queue after successful booking
 - Prevents multiple payments from the same user using transactional queries and RabbitMQ's Pub/Sub architecture
 
-### 4. Flight Notification Service
-
-[Link](https://github.com/Mohitsen11/flight_Notification_Service)
+### 4. [Flight Notification Service](https://github.com/Mohitsen11/flight_Notification_Service)
 
 - Sends email notifications to customers after successful ticket bookings
 - Acts as a Subscriber to the events published by the Booking Service via message queues
