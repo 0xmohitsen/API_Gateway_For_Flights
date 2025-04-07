@@ -1,16 +1,22 @@
-const express = require('express');
+const express = require("express");
+const { UserController } = require("../../controllers");
+const { AuthRequestMiddlewares } = require("../../middlewares");
 const router = express.Router();
 
-const { UserController } = require('../../controllers');
-const { UserMiddlewares } = require('../../middlewares');
-
-router
-    .post('/signup', UserMiddlewares.validateUserRequest ,UserController.signup);
-
-router
-    .post('/signin',UserMiddlewares.validateUserRequest ,UserController.signin);
-
-router
-    .post('/role',UserMiddlewares.checkAuth, UserMiddlewares.isAdmin, UserController.addRoleToUser);
-
+router.post(
+  "/signup",
+  AuthRequestMiddlewares.validateAuthRequest,
+  UserController.signup
+);
+router.post(
+  "/signin",
+  AuthRequestMiddlewares.validateAuthRequest,
+  UserController.signin
+);
+router.post(
+  "/role",
+  AuthRequestMiddlewares.checkAuth,
+  AuthRequestMiddlewares.isAdmin,
+  UserController.addRoleToUsers
+);
 module.exports = router;

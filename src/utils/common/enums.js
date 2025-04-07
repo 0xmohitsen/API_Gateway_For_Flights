@@ -1,9 +1,9 @@
-const ROLE_TYPES = {
+USER_ROLES_ENUMS = {
     ADMIN: 'admin',
     CUSTOMER: 'customer',
     FLIGHT_COMPANY: 'flight_company'
 }
 
 module.exports = {
-    ROLE_TYPES
+    USER_ROLES_ENUMS
 }

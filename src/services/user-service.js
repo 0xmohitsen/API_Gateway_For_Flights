@@ -1,138 +1,173 @@
-const { StatusCodes } = require('http-status-codes');
-const { UserRepository, RoleRepository } = require('../repositories');
-const AppError = require('../utils/error/app-error');
-const { Auth } = require('../utils/common');
-const { Enums } = require('../utils/common');
-
+const { StatusCodes } = require("http-status-codes");
+const { UserRepository, RoleRepository } = require("../repositories");
+const AppError = require("../utils/errors/app-error");
+const { Auth, Enums } = require("../utils/common");
 const userRepo = new UserRepository();
 const roleRepo = new RoleRepository();
-
-async function signup(data){
-    try{
-        const response = await userRepo.create(data);
-        const role = await roleRepo.getRoleByName(Enums.ROLE_TYPES.CUSTOMER);
-        response.addRole(role);
-        return response;
-    } catch(error){
-        // console.log(error);
-        if(error.name === 'SequelizeUniqueConstraintError' || error.name === 'SequelizeValidationError'){
-            let explanation = [];
-            error.errors.forEach((ele) => {
-                explanation.push(ele.message);
-            });
-            throw new AppError(explanation, StatusCodes.BAD_REQUEST);
-        }
-        throw new AppError('Cannot create a new user object', StatusCodes.INTERNAL_SERVER_ERROR);
-    } 
+async function create(data) {
+  try {
+    const user = await userRepo.create(data);
+    const role = await roleRepo.getRoleByName(Enums.USER_ROLES_ENUMS.CUSTOMER);
+    user.addRole(role);
+    return user;
+  } catch (error) {
+    console.log(error.name);
+    if (
+      error.name == "SequelizeValidationError" ||
+      error.name == "SequelizeUniqueConstraintError"
+    ) {
+      let explanation = [];
+      error.errors.forEach((err) => {
+        explanation.push(err.message);
+      });
+      throw new AppError(explanation, StatusCodes.BAD_REQUEST);
+    }
+    throw new AppError(
+      "Cannot create a new user object",
+      StatusCodes.INTERNAL_SERVER_ERROR
+    );
+  }
 }
 
-async function signin(data){
-    try {
-        const validUser = await userRepo.getUserByEmail(data.email);
-        if(!validUser){
-            throw new AppError('User not found', StatusCodes.NOT_FOUND);
-        }
-        const checkPass = await Auth.checkPassword(data.password, validUser.password);
-        if(!checkPass){
-            throw new AppError('Invalid password', StatusCodes.BAD_REQUEST);
-        }
-
-        const jwt = await Auth.createToken({id: validUser.id, email: validUser.email});
-
-        return jwt;
-    } catch (error) {
-        if(error instanceof AppError) throw error;
-        console.log(error);
-        throw new AppError('Something went wrong', StatusCodes.INTERNAL_SERVER_ERROR);
+async function signin(data) {
+  try {
+    const user = await userRepo.getUserByEmail(data.email);
+    if (!user) {
+      throw new AppError(
+        "No user found for the given email",
+        StatusCodes.NOT_FOUND
+      );
     }
+    const passwordMatch = Auth.checkPassword(data.password, user.password);
+    console.log("password match", passwordMatch);
+    if (!passwordMatch) {
+      throw new AppError("Invalid password", StatusCodes.BAD_REQUEST);
+    }
+    const jwt = Auth.createToken({ id: user.id, email: user.email });
+    return jwt;
+  } catch (error) {
+    if (error instanceof AppError) throw error;
+    console.log(error);
+    throw new AppError(
+      "Something went wrong",
+      StatusCodes.INTERNAL_SERVER_ERROR
+    );
+  }
 }
 
-async function isAuthenticated(token){
-    try {
-        console.log('I am in verifyToken service');
-        if(!token){
-            throw new AppError('JWT is missing', StatusCodes.BAD_REQUEST);
-        }
-
-        const response = Auth.verifyToken(token);
-        
-        const user = await userRepo.get(response.id);
-        if(!user){
-            throw new AppError('No user found', StatusCodes.NOT_FOUND);
-        }
-
-        return user.id;
-    } catch (error) {
-        if(error instanceof AppError) throw error;
-        console.log(error);
-        if(error.name === 'JsonWebTokenError'){
-            throw new AppError('Invalid JWT token', StatusCodes.INTERNAL_SERVER_ERROR);
-        }
-        if(error.name === 'TokenExpiredError'){
-            throw new AppError('JWT token is expired', StatusCodes.BAD_REQUEST);
-        }
-        throw new AppError('Something went wrong', StatusCodes.INTERNAL_SERVER_ERROR);
+async function isAuthenticated(token) {
+  try {
+    if (!token) {
+      throw new AppError(
+        "Missing JWT token or Please first login!",
+        StatusCodes.BAD_REQUEST
+      );
     }
+    const response = Auth.verifyToken(token);
+    const user = await userRepo.get(response.id);
+    if (!user) {
+      throw new AppError("No user found", StatusCodes.NOT_FOUND);
+    }
+    return user.id;
+  } catch (error) {
+    if (error instanceof AppError) throw error;
+    if (error.name == "JsonWebTokenError") {
+      throw new AppError("Invalid JWT token", StatusCodes.BAD_REQUEST);
+    }
+    if (error.name == "TokenExpiredError") {
+      throw new AppError("JWT token expired", StatusCodes.BAD_REQUEST);
+    }
+    console.log(error);
+    throw new AppError(
+      "Something went wrong",
+      StatusCodes.INTERNAL_SERVER_ERROR
+    );
+  }
 }
 
-async function addRoleToUser(data){
-    try {
-        const user = await userRepo.get(data.id);
-        if(!user){
-            throw new AppError('No user found', StatusCodes.NOT_FOUND);
-        }
-
-        const role = await roleRepo.getRoleByName(data.role);
-        if(!role){
-            throw new AppError('No role found for the given name', StatusCodes.NOT_FOUND);
-        }
-
-        user.addRole(role);
-
-        return user;
-    } catch (error) {
-        if(error instanceof AppError) throw error;
-        throw new AppError('Something went wrong', StatusCodes.INTERNAL_SERVER_ERROR);
+async function addRoleToUser(data) {
+  try {
+    const user = await userRepo.get(data.id);
+    if (!user) {
+      throw new AppError(
+        "No user found for the given id",
+        StatusCodes.NOT_FOUND
+      );
     }
+    const role = await roleRepo.getRoleByName(data.role);
+    if (!role) {
+      throw new AppError(
+        "No user found for the given role",
+        StatusCodes.NOT_FOUND
+      );
+    }
+    user.addRole(role);
+    return user;
+  } catch (error) {
+    if (error instanceof AppError) throw error;
+    console.log(error);
+    throw new AppError(
+      "Something went wrong",
+      StatusCodes.INTERNAL_SERVER_ERROR
+    );
+  }
 }
 
-async function isAdmin(id){
-    try {
-        const user = await userRepo.get(id);
-        if(!user){
-            throw new AppError('No user found', StatusCodes.NOT_FOUND);
-        }
-        const adminrole = await roleRepo.getRoleByName(Enums.ROLE_TYPES.ADMIN);
-        
-        return user.hasRole(adminrole);
-    } catch (error) {
-        if(error instanceof AppError) throw error;
-        throw new AppError('Something went wrong while checking the admin', StatusCodes.INTERNAL_SERVER_ERROR);
+async function isAdmin(id) {
+  try {
+    const user = await userRepo.get(id);
+    if (!user) {
+      throw new AppError(
+        "No user found for the given id",
+        StatusCodes.NOT_FOUND
+      );
     }
+    const adminRole = await roleRepo.getRoleByName(
+      Enums.USER_ROLES_ENUMS.ADMIN
+    );
+    if (!adminRole) {
+      throw new AppError(
+        "No role found for the given role",
+        StatusCodes.NOT_FOUND
+      );
+    }
+    return user.hasRole(adminRole);
+  } catch (error) {
+    if (error instanceof AppError) throw error;
+    console.log(error);
+    throw new AppError(
+      "Something went wrong",
+      StatusCodes.INTERNAL_SERVER_ERROR
+    );
+  }
 }
 
-async function isNotCustomer(id){
-    try {
-        const user = await userRepo.get(id);
-        if(!user){
-            throw new AppError('No user found', StatusCodes.NOT_FOUND);
-        }
-
-        const flight_companyrole = await roleRepo.getRoleByName(Enums.ROLE_TYPES.FLIGHT_COMPANY);
-
-        return user.hasRole(flight_companyrole);
-        
-    } catch (error) {
-        if(error instanceof AppError) throw error;
-        throw new AppError('Something went wrong while checking the admin or flight_company', StatusCodes.INTERNAL_SERVER_ERROR);
+async function isNotCustomer(id) {
+  try {
+    const user = await userRepo.get(id);
+    if (!user) {
+      throw new AppError("No user found", StatusCodes.NOT_FOUND);
     }
+
+    const flightCompanyRole = await roleRepo.getRoleByName(
+      Enums.ROLE_TYPES.FLIGHT_COMPANY
+    );
+
+    return user.hasRole(flightCompanyRole);
+  } catch (error) {
+    if (error instanceof AppError) throw error;
+    throw new AppError(
+      "Something went wrong while checking the admin or flight_company",
+      StatusCodes.INTERNAL_SERVER_ERROR
+    );
+  }
 }
 
 module.exports = {
-    signup,
-    signin,
-    isAuthenticated,
-    addRoleToUser,
-    isAdmin,
-    isNotCustomer
-}
+  create,
+  signin,
+  isAuthenticated,
+  addRoleToUser,
+  isAdmin,
+  isNotCustomer,
+};

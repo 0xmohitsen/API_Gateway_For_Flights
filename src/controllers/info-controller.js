@@ -1,12 +1,14 @@
-const { StatusCodes } = require("http-status-codes");
+const { StatusCodes } = require('http-status-codes');
 
-async function info(req, res) {
+const info = (req, res) => {
     return res.status(StatusCodes.OK).json({
         success: true,
-        message: 'API IS LIVE',
+        message: 'API is live',
+        error: {},
         data: {},
-        error: {}
     });
 }
 
-module.exports = info;
+module.exports = {
+    info
+}

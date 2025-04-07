@@ -1,13 +1,12 @@
 const express = require('express');
-const { InfoController } = require('../../controllers');
-const userRoutes = require('./user-routes');
-const { UserMiddlewares } = require('../../middlewares');
 
+const { InfoController } = require('../../controllers');
+const { AuthRequestMiddlewares } = require('../../middlewares');
+const userRouter = require('./user-routes');
 const router = express.Router();
 
-router
-    .get('/info', UserMiddlewares.checkAuth , InfoController);
+router.get('/info', InfoController.info);
 
-router.use('/users', userRoutes);
+router.use('/user', userRouter)
 
 module.exports = router;

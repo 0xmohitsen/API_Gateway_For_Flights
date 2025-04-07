@@ -1,11 +1,10 @@
 'use strict';
-
-const bcrypt = require('bcrypt');
-const { ServerConfig } = require('../config');
 const {
   Model
 } = require('sequelize');
-const serverConfig = require('../config/server-config');
+
+const bcrypt = require('bcrypt');
+const { ServerConfig } = require('../config');
 module.exports = (sequelize, DataTypes) => {
   class User extends Model {
     /**
@@ -15,7 +14,7 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      this.belongsToMany(models.Role , {through : 'User_Roles', as: 'role'});
+      this.belongsToMany(models.Role, {through: 'User_Roles', as: 'role'});
     }
   }
   User.init({
@@ -31,18 +30,17 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: false,
       validate: {
-        len:[5,20]
+        len: [3, 50]
       }
-    }
+    },
   }, {
     sequelize,
     modelName: 'User',
   });
 
-  User.beforeCreate(function encrypt(user){
-    const encryptedPassword = bcrypt.hashSync(user.password , +ServerConfig.SALT_ROUND);
+  User.beforeCreate(function encrypt(user) {
+    const encryptedPassword = bcrypt.hashSync(user.password, +ServerConfig.SALT_ROUNDS);
     user.password = encryptedPassword;
   });
-
   return User;
 };

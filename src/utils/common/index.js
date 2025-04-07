@@ -1,6 +1,6 @@
 module.exports = {
-    SuccessResponse: require('./success-response'),
     ErrorResponse: require('./error-response'),
+    SuccessResponse: require('./success-response'),
     Enums: require('./enums'),
     Auth: require('./auth')
 }
