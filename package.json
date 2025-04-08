@@ -4,7 +4,7 @@
   "description": "This service acts as a api gateway and do the auth too.",
   "main": "index.js",
   "scripts": {
-    "dev": "npx nodemon src/index.js"
+    "start": "npx nodemon src/index.js"
   },
   "author": "Mohit",
   "license": "ISC",
